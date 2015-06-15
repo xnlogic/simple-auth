@@ -1,3 +1,27 @@
+TODO
+================
+
+- Where should api config + db be stored? (/opt/xn_apps?)
+- why did we have confirmed/unconfirmed status in users?
+- creating users
+  - select client
+  - default client
+  - wtf is up with name field
+- compatibility with previous auth routes
+- ensure json sign in works
+- user admin
+  - admin capabilities based on membership in configured matching group in API
+  - copy over the group management UI
+  - render user list
+- what to show non-admin users?
+
+Users are replicated to the API as soon as they are created.
+x delete users in API when they are deleted? (no)
+- delete user tokens when user is deleted
+
+Future:
+- many clients per user?
+
 Auth
 ================
 

@@ -1,5 +1,12 @@
 require File.expand_path('../boot', __FILE__)
 
+$:.unshift './lib'
+
+require 'uri'
+require 'net/http'
+require 'xn/api'
+require 'securerandom'
+
 require 'rails/all'
 
 # Require the gems listed in Gemfile, including any gems
