@@ -4,7 +4,7 @@ module Concerns
 
     attr_accessor :token, :token_error
 
-    def sign_in(resource_name, user)
+    def sign_in(resource_name, user, *args)
       begin
         self.token = user.create_api_token
         session['api_token'] = token['token']
