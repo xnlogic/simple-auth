@@ -1,12 +1,13 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
-  before_action :authenticate_admin_or_current_user!, except: [:index]
+  before_action :authenticate_admin_or_current_user!, except: [:welcome]
 
   def index
     @users = User.same_client_as(current_user).order(:name).all
     @users_to_groups = with_current_user_api do |api|
       Group.users_to_groups_map(api)
     end
+    @users_to_groups ||= Group.empty_user_group_hash
     respond_to do |format|
       format.html
       format.json { render json: @users }
@@ -75,7 +76,7 @@ class UsersController < ApplicationController
 
   def authenticate_user_manager!
     if not user_manager?
-      render_unauthorized
+      render_unauthorized 'You must have update access on API Permissions.'
     end
   end
 

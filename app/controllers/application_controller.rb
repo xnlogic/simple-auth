@@ -14,6 +14,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def user_has_security_access?
+    info = current_user_account_info
+    perms = info['permissions'] if info
+    can_update = perms['update_access'] if perms
+    can_update.include? 'permission' if can_update
+  end
+
   def can_authorize?
     logged_in? and current_user_account_info
   end
@@ -28,15 +35,23 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def render_unauthorized
+  def render_unauthorized(reason = nil)
     respond_to do |format|
-      format.html { redirect_to '/login' }
-      format.json { render json: {
+      format.html do
+        if reason
+          flash[:error] = "Unauthorized: #{ reason }"
+        else
+          flash[:error] = "Unauthorized."
+        end
+        redirect_to :back
+      end
+      format.json do
+        render json: {
           response: 'unauthorized',
           url: request.fullpath,
           message: 'The current user is not authorized to make this request'
         }, status: :unauthorized
-      }
+      end
     end
   end
 

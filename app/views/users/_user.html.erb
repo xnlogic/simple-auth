@@ -1,4 +1,20 @@
-<td><%= user.api_user_id %></td>
 <td><%= user.client %></td>
-<td><%= link_to user.name, user %></td>
-<td><%= link_to user.email, user %></td>
+<td><%= link_to(user.name, edit_user_path(user)) %></td>
+<td><%= link_to user.email, "mailto:#{user.email}" %></td>
+<td><%= format_user_phone(user.phone) %></td>
+<td>
+  <% if @users_to_groups[user.api_user_id].empty? %>
+    <%= empty_cell_contents %>
+  <% else %>
+    <%=
+      @users_to_groups[user.api_user_id].map { |g|
+        content_tag 'span', g.name
+      }.join(', ').html_safe
+    %>
+  <% end %>
+</td>
+<td>
+  <% if @users_to_groups[user.api_user_id].any? %>
+    TODO: quick user disable button. Workaround: remove groups from user
+  <% end %>
+</td>

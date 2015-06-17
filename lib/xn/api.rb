@@ -34,8 +34,9 @@ module XN
             JSON.parse(f.read)
           end
         else
-          {"api_server" => (ENV['XN_API'] || "http://192.168.168.168"),
-           "api_prefix" => (ENV['XN_API_PREFIX'] ? '' : "/v1"),
+          {"api_ip" => ENV.fetch('API_PORT_8080_TCP_ADDR', "192.168.168.168"),
+           "api_port" => ENV.fetch('API_PORT_8080_TCP_PORT', '80'),
+           "api_prefix" => ENV.fetch('XN_API_PREFIX', "/v1"),
            "default_client" => "dev",
            "sample_passwords" => [
              "Enrique Chan",
@@ -129,7 +130,7 @@ module XN
     private
 
     def api_server_url
-      URI(Api.config['api_server'])
+      URI("http://#{Api.config['api_ip']}:#{Api.config['api_port']}")
     end
 
     def api_prefix
