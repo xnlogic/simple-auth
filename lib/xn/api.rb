@@ -50,6 +50,14 @@ module XN
         end
       end
 
+      def create_users!
+        each_client do |authenticator_api|
+          puts "Loading client data: #{ authenticator_api.client }"
+          result = User.create_users_from_api authenticator_api
+          puts JSON.pretty_generate result
+        end
+      end
+
       def default_client
         config['default_client']
       end

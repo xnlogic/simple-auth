@@ -105,9 +105,7 @@ class User < ActiveRecord::Base
   end
 
   def create_api_user(api, group_ids = nil)
-    if api_user_id
-      fail XN::Error::BadRequest, "Can not create API user with existing ID"
-    else
+    unless api_user_id
       self.api_user_id = api.put('/model/user_account', api_properties(group_ids)).first
     end
   end
@@ -138,7 +136,7 @@ class User < ActiveRecord::Base
     if id
       "/model/user_account/id/#{ api_user_id }"
     else
-      fail XN::Error::BadRequest, "Missing API user ID creating request"
+      fail XN::Error::BadRequestError, "Missing API user ID creating request"
     end
   end
 end

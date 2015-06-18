@@ -14,13 +14,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def user_has_security_access?
-    info = current_user_account_info
-    perms = info['permissions'] if info
-    can_update = perms['update_access'] if perms
-    can_update.include? 'permission' if can_update
-  end
-
   def can_authorize?
     logged_in? and current_user_account_info
   end
@@ -29,9 +22,21 @@ class ApplicationController < ActionController::Base
     not api_token.blank?
   end
 
+  def user_manager?
+    can_authorize? && has_user_management_permissions?
+  end
+
+  def has_user_management_permissions?
+    permissions = current_user_account_info['permissions']
+    return has_permissions?(permissions, [:create, :read, :update, :delete], 'user') &&
+           has_permissions?(permissions, [:update], 'permission')
+  end
+
   def has_permissions?(permissions, types, model_name)
-    types.all? do |type|
-      permissions["#{ type }_access"].include? model_name
+    if permissions
+      types.all? do |type|
+        permissions["#{ type }_access"].include? model_name
+      end
     end
   end
 

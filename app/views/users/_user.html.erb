@@ -1,4 +1,3 @@
-<td><%= user.client %></td>
 <td><%= link_to(user.name, edit_user_path(user)) %></td>
 <td><%= link_to user.email, "mailto:#{user.email}" %></td>
 <td><%= format_user_phone(user.phone) %></td>
@@ -15,6 +14,6 @@
 </td>
 <td>
   <% if @users_to_groups[user.api_user_id].any? %>
-    TODO: quick user disable button. Workaround: remove groups from user
+    <%# TODO: quick user disable button. Workaround: remove groups from user %>
   <% end %>
 </td>

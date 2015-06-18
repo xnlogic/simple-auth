@@ -80,16 +80,6 @@ class UsersController < ApplicationController
     end
   end
 
-  def has_user_management_permissions?
-    permissions = current_user_account_info['permissions']
-    return has_permissions?(permissions, [:create, :read, :update, :delete], 'user') &&
-           has_permissions?(permissions, [:update], 'permission')
-  end
-
-  def user_manager?
-    can_authorize? && has_user_management_permissions?
-  end
-
   def new_user_groups
     with_current_user_api do |api|
       all_available_groups api
