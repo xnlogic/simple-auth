@@ -68,7 +68,13 @@ module XN
       end
 
       def admin_token
-        ENV['ADMIN_TOKEN'] || File.read(ADMIN_TOKEN_PATH).match(/'(.*)'$/)[1]
+        ENV.fetch 'ADMIN_TOKEN' do
+          if File.exist? ADMIN_TOKEN_PATH
+            File.read(ADMIN_TOKEN_PATH).match(/'(.*)'$/)[1]
+          else
+            'admin' # May work if the API is in dev mode
+          end
+        end
       end
 
       def client_config(client)
