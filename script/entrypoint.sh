@@ -8,7 +8,8 @@ else
 fi
 
 if [ "$command" = 'server' ]; then
-  exec puma -b tcp://0.0.0.0:80 -e production
+  rake db:migrate
+  exec puma -b tcp://0.0.0.0:80 -e $RAILS_ENV
 elif [ "$command" = 'console' ]; then
   exec rails console
 fi

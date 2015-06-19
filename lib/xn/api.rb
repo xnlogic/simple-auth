@@ -34,8 +34,8 @@ module XN
             JSON.parse(f.read)
           end
         else
-          {"api_ip" => ENV.fetch('API_PORT_8080_TCP_ADDR', "192.168.168.168"),
-           "api_port" => ENV.fetch('API_PORT_8080_TCP_PORT', '80'),
+          {"api_ip" => ENV.fetch('PROD_PORT_8080_TCP_ADDR', ENV.fetch('API_PORT_8080_TCP_ADDR', "192.168.168.168")),
+           "api_port" => ENV.fetch('PROD_PORT_8080_TCP_PORT', ENV.fetch('API_PORT_8080_TCP_PORT', '80')),
            "api_prefix" => ENV.fetch('XN_API_PREFIX', "/v1"),
            "default_client" => "dev",
            "sample_passwords" => [
