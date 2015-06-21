@@ -1,1 +1,33 @@
-welcome y'all!!
+<script>
+  function set_cookie() {
+    var token = '<%= session[:api_token] %>';
+    if (token !== '') {
+      var a = token.split(' ');
+      if (a.length === 2) {
+        document.cookie = ('XNClient=' + a[0] + '; path=/');
+        document.cookie = ('XNToken=' + a[1] + '; path=/');
+      }
+    }
+    return true;
+  }
+</script>
+
+<h3>LightMesh User Management</h3>
+
+<hr>
+<h4><a href='/' onclick='return set_cookie();'>Search and Admin Interface</a></h4>
+<h4><a href='/ipam'>IPAM</a></h4>
+
+<hr>
+<h4><a href='/users'>User Management</a></h4>
+<h4><a href='/users/edit'>Change Password</a></h4>
+
+<hr>
+<h4>API Token</h4>
+<p onclick='$(".token-toggle").toggle(); return false;'>
+  <a class='token-toggle' href='#'>
+    (click to show token)
+  </a>
+  <code style='display:none' class='token-toggle'><%= session[:api_token] %></code>
+</p>
+
