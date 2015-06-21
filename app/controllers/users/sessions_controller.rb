@@ -1,4 +1,6 @@
 class Users::SessionsController < Devise::SessionsController
+  prepend_before_filter :really_require_no_authentication, only: [:new]
+
   include Concerns::SignIn
 
   respond_to :json
@@ -10,12 +12,9 @@ class Users::SessionsController < Devise::SessionsController
 
   def create
     self.resource = user = warden.authenticate!(auth_options)
-    sign_in resource_name, user
     respond_with_token do |format|
-      format.html do
-        set_flash_message(:notice, :signed_in) if is_flashing_format?
-        respond_with resource, location: after_sign_in_path_for(resource)
-      end
+      set_flash_message(:notice, :signed_in) if is_flashing_format?
+      respond_with resource, location: after_sign_in_path_for(resource)
     end
   end
 
@@ -24,4 +23,13 @@ class Users::SessionsController < Devise::SessionsController
   #   super
   # end
 
+  private
+
+  unless instance_method(:really_require_no_authentication)
+    alias really_require_no_authentication require_no_authentication
+  end
+
+  def require_no_authentication
+    # NO OP
+  end
 end
