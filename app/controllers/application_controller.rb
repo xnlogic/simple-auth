@@ -48,7 +48,7 @@ class ApplicationController < ActionController::Base
         else
           flash[:error] = "Unauthorized."
         end
-        redirect_to :back
+        redirect_to new_user_session_path
       end
       format.json do
         render json: {

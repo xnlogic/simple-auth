@@ -72,8 +72,10 @@ pickle-email-*.html
 /*.tmproj
 
 # vim artifacts
-**.swp
+**.sw[po]
+**.un~
 
 # Environment files that may contain sensitive data
 .env
 .powenv
+
