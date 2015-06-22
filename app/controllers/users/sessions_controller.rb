@@ -18,9 +18,12 @@ class Users::SessionsController < Devise::SessionsController
   end
 
   # DELETE /resource/sign_out
-  # def destroy
-  #   super
-  # end
+  def destroy
+    with_current_user_api do |api|
+      User.log_out_api(api)
+    end
+    super
+  end
 
   private
 

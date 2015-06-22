@@ -49,6 +49,10 @@ class User < ActiveRecord::Base
     def get_account_info(api)
       api.get('/account').first
     end
+
+    def log_out_api(api)
+      api.delete('/account').first
+    end
   end
 
   validates :name, presence: true
