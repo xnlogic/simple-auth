@@ -16,11 +16,11 @@ class Users::RegistrationsController < Devise::RegistrationsController
       if resource.active_for_authentication?
         set_flash_message :notice, :signed_up if is_flashing_format?
         sign_up(resource_name, resource)
-        respond_with resource, location: welcome_user_path(resource)
+        respond_with resource, location: welcome_users_path
       else
         set_flash_message :notice, :"signed_up_but_#{resource.inactive_message}" if is_flashing_format?
         expire_data_after_sign_in!
-        respond_with resource, location: welcome_user_path(resource)
+        respond_with resource, location: welcome_users_path
       end
     else
       clean_up_passwords resource
@@ -71,11 +71,11 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # The path used after sign up.
   def after_sign_up_path_for(resource)
-    welcome_user_path(resource)
+    welcome_users_path
   end
 
   # The path used after sign up for inactive accounts.
   def after_inactive_sign_up_path_for(resource)
-    welcome_user_path(resource)
+    welcome_users_path
   end
 end
