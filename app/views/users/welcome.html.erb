@@ -12,22 +12,26 @@
   }
 </script>
 
-<h3>LightMesh User Management</h3>
+<h3>LightMesh</h3>
 
-<hr>
 <h4><a href='/' onclick='return set_cookie();'>Search and Admin Interface</a></h4>
 <h4><a href='/ipam'>IPAM</a></h4>
 
 <hr>
-<h4><a href='/users'>User Management</a></h4>
+<h3>User Management</h3>
 <h4><a href='/users/edit'>Change Password</a></h4>
+<h4><a href='/users'>Users</a></h4>
 
 <hr>
-<h4>API Token</h4>
-<p onclick='$(".token-toggle").toggle(); return false;'>
-  <a class='token-toggle' href='#'>
+<h3>API Token</h3>
+<p>
+  <a class='token-toggle' href='#' onclick='$(".token-toggle").toggle(); return false;'>
     (click to show token)
   </a>
+  <a style='display:none' class='token-toggle' href='#' onclick='$(".token-toggle").toggle(); return false;'>
+    (click to hide token)
+  </a>
+</p>
+<p>
   <code style='display:none' class='token-toggle'><%= session[:api_token] %></code>
 </p>
-
