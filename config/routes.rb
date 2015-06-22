@@ -5,7 +5,7 @@ Rails.application.routes.draw do
     registrations: 'users/registrations'
   }
   resources :users do |u|
-    get 'welcome', on: :member
+    get 'welcome', on: :collection
   end
 
   devise_scope :user do

@@ -6,7 +6,19 @@ class ApplicationController < ActionController::Base
 
   rescue_from XN::Error::ApiError, with: :render_api_exception
 
+  prepend_before_filter :log_out_if_token_invalid
+
   protected
+
+  def log_out_if_token_invalid
+    if logged_in?
+      current_user_account_info
+    end
+  rescue XN::Error::UnauthorizedError
+    session['api_token'] = nil
+    user = current_user
+    sign_out user if user
+  end
 
   def current_user_account_info
     @account_info ||= with_current_user_api do |api|
