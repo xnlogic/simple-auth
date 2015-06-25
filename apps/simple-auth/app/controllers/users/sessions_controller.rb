@@ -1,4 +1,6 @@
 class Users::SessionsController < Devise::SessionsController
+  include Concerns::SignIn
+
   attr_accessor :token, :token_error
 
   respond_to :json
@@ -10,6 +12,7 @@ class Users::SessionsController < Devise::SessionsController
   #
 
   def create
+    warden.logout if current_user
     user, opts = warden.send :_perform_authentication, auth_options
     if user
       self.resource = user
@@ -62,23 +65,5 @@ class Users::SessionsController < Devise::SessionsController
 
   def after_sign_in_path_for(user)
     welcome_users_path
-  end
-
-  def create_token(user)
-    begin
-      self.token = user.create_api_token
-    rescue XN::Error::ApiError => e
-      self.token_error = {
-        status: (e.status || 400),
-        message: "Unable to generate token: #{ e.message }"
-      }
-    end
-  end
-
-  # Only call this when creating a user management session.
-  def sign_in(resource_name, user, *args)
-    create_token(user)
-    session['api_token'] = token ? token['token'] : nil
-    super
   end
 end
