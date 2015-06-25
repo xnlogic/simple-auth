@@ -1,72 +1,76 @@
+XN Logic Simple Authentication Server
+================
+
+The XN framework provides powerful authorization tools, but relies on external authentication providers for
+maximum flexibility in enterprise environments. This auth server is a very bare-bones Rails application based
+on Devise that may be used to provide authentication in case there is no pre-existing provider available.
+
+Installation
+================
+
+In your project root directory:
+
+```bash
+git remote add auth https://github.com/xnlogic/simple-auth.git
+git fetch auth
+git merge auth master
+```
+
+You will need to add the auth container to your docker-compose.yml as well.
+
+Development:
+```yaml
+auth:
+  build: apps/simple-auth
+  links:
+    - api
+  volumes_from:
+    - data
+  volumes:
+    - ./apps/simple-auth:/app
+  environment:
+    XN_ENV: development
+    RAILS_ENV: development
+```
+
+Production:
+```yaml
+prodauth:
+  image: lightmesh/simple-auth
+  links:
+    - prodapi
+  volumes_from:
+    - data
+  environment:
+    XN_ENV: production
+    RAILS_ENV: production
+    ADMIN_NAME: "Configure Me"
+    ADMIN_EMAIL: "admin@example.com"
+    ADMIN_PASSWORD: "..........."
+    DOMAIN_NAME: "example.com"
+    # Use the following command to generate the secret key base:
+    # docker-compose run --rm prodauth rake token
+    SECRET_KEY_BASE: "0000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+```
+
+Don't forget to set the secret key and configure your email settings!
+
+```bash
+docker-compose run --rm prodauth rake token
+```
+
+License
+-------
+
+Copyright 2015 XN Logic
+
 TODO
 ================
 
-- Where should api config + db be stored? (/opt/xn_apps?)
-- why did we have confirmed/unconfirmed status in users?
-- creating users
-  - select client
-  - default client
-  - wtf is up with name field
-- compatibility with previous auth routes
-- ensure json sign in works
-- user admin
-  - admin capabilities based on membership in configured matching group in API
-  - copy over the group management UI
-  - render user list
-- what to show non-admin users?
-
-Users are replicated to the API as soon as they are created.
-x delete users in API when they are deleted? (no)
-- delete user tokens when user is deleted
+Creating users
+- select client
+- default client
 
 Future:
 - many clients per user?
 
-Auth
-================
-
-This application was generated with the [rails_apps_composer](https://github.com/RailsApps/rails_apps_composer) gem
-provided by the [RailsApps Project](http://railsapps.github.io/).
-
-Rails Composer is open source and supported by subscribers. Please join RailsApps to support development of Rails Composer.
-
-Problems? Issues?
------------
-
-Need help? Ask on Stack Overflow with the tag 'railsapps.'
-
-Your application contains diagnostics in the README file. Please provide a copy of the README file when reporting any issues.
-
-If the application doesn't work as expected, please [report an issue](https://github.com/RailsApps/rails_apps_composer/issues)
-and include the diagnostics.
-
-Ruby on Rails
--------------
-
-This application requires:
-
-- Ruby 2.2.2
-- Rails 4.2.1
-
-Learn more about [Installing Rails](http://railsapps.github.io/installing-rails.html).
-
-Getting Started
----------------
-
-Documentation and Support
--------------------------
-
-Issues
--------------
-
-Similar Projects
-----------------
-
-Contributing
-------------
-
-Credits
--------
-
-License
--------
