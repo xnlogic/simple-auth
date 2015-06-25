@@ -1,5 +1,5 @@
 <script>
-  function set_cookie() {
+  (function() {
     var token = '<%= session[:api_token] %>';
     if (token !== '') {
       var a = token.split(' ');
@@ -9,12 +9,12 @@
       }
     }
     return true;
-  }
+  })();
 </script>
 
 <h3>LightMesh</h3>
 
-<h4><a href='/' onclick='return set_cookie();'>Search and Admin Interface</a></h4>
+<h4><a href='/'>Search and Admin Interface</a></h4>
 <h4><a href='/ipam'>IPAM</a></h4>
 
 <hr>
