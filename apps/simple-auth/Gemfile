@@ -14,7 +14,7 @@ group :development, :test do
   gem 'coffee-rails', '~> 4.1.0'
   gem 'bootstrap-sass'
 end
-gem 'devise'
+gem 'devise', '3.5.1' # locked because sessions controller reaches into internals.
 gem 'puma'
 group :development do
   gem 'better_errors'
