@@ -2,13 +2,18 @@
 
 rev=$(script/git-revision)
 
+_build() {
+  docker build -t $1 .
+  docker tag $1 $1:$rev
+}
+
 rebuild() {
   list=$(docker images | grep $1 | tr -s ' ' | cut -d ' ' -f -2 | tr ' ' :)
   if [ "$list" ]; then
-    docker rmi $list
+    docker rmi $list && _build $1 || echo "FATAL: Did not build $1"
+  else
+    _build $1
   fi
-  docker build -t $1 .
-  docker tag $1 $1:$rev
 }
 
 pull() {
