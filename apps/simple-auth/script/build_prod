@@ -1,0 +1,67 @@
+#!/bin/bash
+
+rev=$(script/git-revision)
+
+rebuild() {
+  list=$(docker images | grep $1 | tr -s ' ' | cut -d ' ' -f -2 | tr ' ' :)
+  if [ "$list" ]; then
+    docker rmi $list
+  fi
+  docker build -t $1 .
+  docker tag $1 $1:$rev
+}
+
+pull() {
+  echo "Pulling base images"
+  docker pull xnlogic/api-base \
+    && echo "Updating caches" \
+    && docker pull xnlogic/simple-auth
+  return $!
+}
+
+build_auth() {
+  echo Building xnlogic/simple-auth image
+  rebuild xnlogic/simple-auth
+  return $!
+}
+
+build() {
+  pull
+  auth=build_auth
+  if [ $auth ]; then
+    echo Build successful.
+    return 0
+  else
+    echo Build failed.
+    return 1
+  fi
+}
+
+push_auth() {
+  echo docker push xnlogic/simple-auth \
+    && docker push xnlogic/simple-auth
+  return $!
+}
+
+push() {
+  push_auth \
+    && echo "Push successful"
+}
+
+if [[ "$1" == "build"* ]]; then
+  if $1; then
+    if [ "--push" = "$2" ]; then
+      push
+    else
+      echo Not pushing without --push
+    fi
+  fi
+elif [[ "$1" == "push"* ]]; then
+  $1
+else
+  echo Usage:
+  echo
+  echo "$0 build           Just build"
+  echo "$0 build --push    Build and push"
+  echo "$0 push            Push existing build to Docker Hub"
+fi
