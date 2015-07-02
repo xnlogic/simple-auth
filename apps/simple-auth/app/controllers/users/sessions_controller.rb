@@ -1,8 +1,6 @@
 class Users::SessionsController < Devise::SessionsController
   include Concerns::SignIn
 
-  attr_accessor :token, :token_error
-
   respond_to :json
 
   # GET /resource/sign_in

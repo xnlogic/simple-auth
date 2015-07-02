@@ -1,5 +1,6 @@
 module Concerns
   module SignIn
+    attr_accessor :token, :token_error
 
     def create_token(user)
       begin
