@@ -9,6 +9,6 @@ RUN mkdir -p /app
 WORKDIR /app
 
 COPY . /app
-RUN bundle install --without 'development test'
+RUN bundle install
 
 ENTRYPOINT [ "/app/script/entrypoint.sh" ]
