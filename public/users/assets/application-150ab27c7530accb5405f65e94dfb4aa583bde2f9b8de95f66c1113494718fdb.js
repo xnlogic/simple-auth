@@ -35114,27 +35114,6 @@ var styleDirective = valueFn({
 })(window, document);
 
 !window.angular.$$csp() && window.angular.element(document).find('head').prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide{display:none !important;}ng\\:form{display:block;}.ng-animate-block-transitions{transition:0s all!important;-webkit-transition:0s all!important;}.ng-hide-add-active,.ng-hide-remove{display:block!important;}</style>');
-(function() {
-  var app;
-
-  app = angular.module("Users", []);
-
-  app.config([
-    "$httpProvider", function($httpProvider) {
-      $httpProvider.defaults.headers.common['X-CSRF-Token'] = $('meta[name=csrf-token]').attr('content');
-      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    }
-  ]);
-
-  this.UserCtrl = [
-    '$scope', '$http', function($scope, $http) {
-      return $scope.searchUsers = function(term) {
-        return $http.get("/users/search_ldap?term=" + term);
-      };
-    }
-  ];
-
-}).call(this);
 // This is a manifest file that'll be compiled into application.js, which will include all the files
 // listed below.
 //
