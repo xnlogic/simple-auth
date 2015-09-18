@@ -1,0 +1,21 @@
+<% if user_signed_in? %>
+  <div class="navbar navbar-default subnav">
+    <div class="container-fluid">
+      <ul class="nav navbar-nav">
+        <li>
+          <%= link_to 'users', users_path, class: "subnav-link" %>
+        </li>
+      </ul>
+      <div id="actions" class="btn-group navbar-right">
+        <%= link_to new_user_path do %>
+          <div class="btn btn-default">new user</div>
+        <% end %>
+        <% if ldap_enabled? %>
+          <%= link_to new_ldap_user_path do %>
+            <div class="btn btn-default">new ldap user</div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

@@ -32,7 +32,7 @@ class Group
 
   def user_ids
     api.get(group_users_url).map do |user|
-      user[0]
+      user[0].to_s
     end
   end
 

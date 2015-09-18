@@ -1,0 +1,109 @@
+<%= render :partial => 'users/users_table' %>
+<script>
+  var app;
+
+  app = angular.module("Users", []);
+
+  app.config(["$httpProvider", function($httpProvider) {
+      $httpProvider.defaults.headers.common['X-CSRF-Token'] = $('meta[name=csrf-token]').attr('content');
+      return $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    }
+  ]);
+
+  app.controller("UserCtrl", ['$scope', '$http', function($scope, $http) {
+
+    $scope.searchUsers = function() {
+      $scope.searching = true;
+      $http.get("/users/search_ldap_users?search=" + $scope.term).then(function(res) {
+        $scope.ldap_results = res.data;
+        $scope.searching = false;
+      })};
+
+      $scope.setLDAPUser = function(i) {
+        $scope.ldap_user = $scope.ldap_results[i];
+        console.log($scope.ldap_user);
+      }
+  }]);
+</script>
+<div class="modal-backdrop"></div>
+<div class="modal user-modal" ng-app="Users" ng-controller="UserCtrl">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">
+          <h4 class="modal-title">
+            new LDAP user
+          </h4></div>
+      </div>
+      <%= form_for(@user, url: create_user_path(@user), html: { class: 'user-form' }) do |f| %>
+        <div class="modal-body">
+          <div class=row>
+            <div class="col-xs-8 ">
+              <div class="form-inline">
+                <%= f.hidden_field :client, :autofocus => true, class: 'form-control' %>
+                <div class="form-group">
+                  <label>Search Directory</label>
+                  <br/>
+                  <input id="ldap-search" class="form-control" type="text" ng-model="term"/>
+                  <br/>
+                  <div class="form-errors" ng-hide="term"><%= @user.errors[:name].join(",") %></div>
+                </div>
+                <div class="form-group">
+                  <div class="btn btn-default" ng-click="searchUsers()">Search</div>
+                </div>                
+              </div>
+              <br/>
+              <b ng-show="searching">Searching LDAP Directory...</b>
+              <div id="ldap-result-wrapper" ng-show="ldap_results">
+                <ul class="nav nav-list ldap-results" ng-hide="searching">
+                  <li ng-repeat="result in ldap_results" ng-click="setLDAPUser($index)">
+                    <a ng-class="{'active': result.userprincipalname == ldap_user.userprincipalname}">
+                      {{result.cn}} {{result.userprincipalname}}
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <input type="hidden" ng-value="ldap_user.cn" name="user[name]"/>
+              <input type="hidden" ng-value="ldap_user.userprincipalname" name="user[user_name]"/>
+              <input type="hidden" value="LDAP" name="user[account_type]"/>
+              <input type="hidden" value="placeholder" name="user[password]"/>
+              <input type="hidden" value="placeholder" name="user[password_confirmation]"/>
+            </div>
+            <div class=col-xs-4>
+              <div class="form-group">
+                <label>Lightmesh Email</label>
+                <%= f.email_field :email, class: 'form-control' %>
+                <div class="form-errors"><%= @user.errors[:email].join(",") %></div>
+              </div>
+              <div class=form-group>
+                <label for='user[group_ids][]'>Groups</label><span class=small> (multi-select)</span>
+                <select class='form-control multi-select' id=user_group_ids
+                        style='height: 20em'
+                        name='user[group_ids][]' multiple=true data-placeholder="Choose one or more groups...">
+                  <% @groups.each do |group| -%>
+                    <option value='<%= group.id %>' <%= 'selected' if @user_groups.include?(group) %>>
+                    <%= group.name %>
+                    </option>
+                  <% end -%>
+                </select>
+              </div>
+              <br/>
+              <div class=form-group>
+                <label>Read Only</label>
+                <%= f.check_box :read_only %>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="form-group pull-right">
+            <%= f.submit @user.new_record? ? 'Create' : 'Update', class: 'btn btn-default' %>
+            <a href="/users">
+              <div class="btn btn-default">Cancel</div>
+            </a>
+          </div>
+        <div>
+      <% end %>
+    </div>
+  </div>
+</div>

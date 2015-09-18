@@ -1,5 +1,7 @@
 class Users::RegistrationsController < Devise::RegistrationsController
   include Concerns::SignIn
+  before_action :set_user_locals, only: [:edit, :update]
+  layout 'signup', only: [:new, :create]
 
   # GET /resource/sign_up
   # def new
@@ -15,7 +17,8 @@ class Users::RegistrationsController < Devise::RegistrationsController
     if resource.persisted?
       if resource.active_for_authentication?
         set_flash_message :notice, :signed_up if is_flashing_format?
-        sign_up(resource_name, resource)
+        UserMailer.sign_up_confirmation(resource, request.base_url).deliver_now!
+        UserMailer.sign_up_notification(resource, request.base_url).deliver_now!
         respond_with resource, location: welcome_users_path
       else
         set_flash_message :notice, :"signed_up_but_#{resource.inactive_message}" if is_flashing_format?
@@ -31,9 +34,9 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
 
   # GET /resource/edit
-  # def edit
-  #   super
-  # end
+   def edit
+     super
+   end
 
   # PUT /resource
   # def update
@@ -77,5 +80,19 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # The path used after sign up for inactive accounts.
   def after_inactive_sign_up_path_for(resource)
     welcome_users_path
+  end
+
+  def after_update_path_for(resource)
+    users_path
+  end
+
+  private
+
+  def set_user_locals
+    @users = User.same_client_as(current_user).order(:name).all
+    @users_to_groups = with_current_user_api do |api|
+      Group.users_to_groups_map(api)
+    end
+    @users_to_groups ||= Group.empty_user_group_hash
   end
 end

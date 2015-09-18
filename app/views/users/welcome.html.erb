@@ -12,25 +12,16 @@
   })();
 </script>
 
-<h3>Application</h3>
+<div class="alert alert-info">Thank you for Registering!</div>
+<div class="panel">
+  <div class="panel-body">
+    <p>
+      Your account has been submitted for approval.  
+      <br/>
+      You will receive an email notification when your account has been approved</p>
+  </div>
+</div>
 
-<h4><a href='/'>API Admin Interface</a></h4>
-
-<hr>
-<h3>User Management</h3>
-<h4><a href='/users/edit'>Change Password</a></h4>
-<h4><a href='/users'>Users</a></h4>
-
-<hr>
-<h3>API Token</h3>
-<p>
-  <a class='token-toggle' href='#' onclick='$(".token-toggle").toggle(); return false;'>
-    (click to show token)
-  </a>
-  <a style='display:none' class='token-toggle' href='#' onclick='$(".token-toggle").toggle(); return false;'>
-    (click to hide token)
-  </a>
-</p>
 <p>
   <code style='display:none' class='token-toggle'><%= session[:api_token] %></code>
 </p>

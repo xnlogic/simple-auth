@@ -1,41 +1,91 @@
-<div class=authform>
-  <h3>Edit User Details and Group Memberships</h3>
-  <%= form_for(@user, html: { class: 'user-form' }) do |f| %>
-    <%# devise_error_messages! %>
-    <div class=form-group>
-      <%= f.label :database %>
-      <div><%= @user.client %></div>
+<%= render :partial => 'users/users_table' %>
+<div class="modal-backdrop"></div>
+<div class="modal user-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <%= form_for(@user, html: { class: 'user-form' }) do |f| %>
+        <div class="modal-header">
+          <div class="modal-title">edit user</div>
+        </div>
+        <div class="modal-body">
+          <%# devise_error_messages! %>
+          <div class=row>
+            <div class=col-xs-6>
+              <div class=form-group>
+                <%= f.label :name %>
+                <%= f.text_field :name, class: 'form-control' %>
+                <%= @user.errors[:name].join(",") %>
+              </div>
+              <div class=form-group>
+                <%= f.label :email %>
+                <%= f.email_field :email, autocapitalize: 'off', class: 'form-control' %>
+                <%= @user.errors[:email].join(",") %>
+              </div>
+              <div class=form-group>
+                <%= f.label :phone, 'Contact Number' %>
+                <%= f.phone_field :phone, class: 'form-control' %>
+                <%= @user.errors[:phone].join(",") %>
+              </div>
+              <% if @user.account_type=='LOCAL' %>
+                <div class=form-group>
+                  <%= f.label :password %>
+                  <%= f.password_field :password, placeholder: 'Leave blank for unchanged', class: 'form-control' %>
+                  <%= @user.errors[:password].join(",") %>
+                </div>
+              <% end %>
+              <div class=form-group>
+                <div class=row>
+                  <div class=col-xs-6>
+                    <%= f.label :database %>
+                    <div><%= @user.client %></div>
+                  </div>
+                  <% if ldap_enabled? %>
+                    <div class=col-xs-6>
+                      <%= f.label :account_type %>
+                      <div><%= @user.account_type %></div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+            <div class=col-xs-6>
+              <div class=form-group>
+                <label for='user[group_ids][]'>Groups</label><span class=small> (multi-select)</span>
+                <select class='form-control multi-select' id=user_group_ids
+                        style='height: 20em'
+                        name='user[group_ids][]' multiple=true data-placeholder="Choose one or more groups...">
+                  <% @groups.each do |group| -%>
+                    <option value='<%= group.id %>' <%= 'selected' if @user_groups.include?(group) %>>
+                    <%= group.name %>
+                    </option>
+                  <% end -%>
+                </select>
+              </div>
+              <br/>
+              <div class=form-group>
+                <div class="row">
+                  <div class="col-xs-4">
+                    <%= f.check_box :read_only %>
+                    <label>Read Only</label>
+                  </div>
+                  <div class="col-xs-8">
+                    <%= f.check_box :notify_of_signup %>
+                    <label>Receive User Signup Notifications</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="form-group pull-right">
+            <%= f.submit @user.new_record? ? 'Create' : 'Update', class: 'btn btn-default' %>
+            <a href="/users">
+              <div class="btn btn-default">Cancel</div>
+            </a>
+          </div>
+        <div>
+      <% end %>
     </div>
-    <div class=form-group>
-      <%= f.label :name %>
-      <%= f.text_field :name, class: 'form-control' %>
-    </div>
-    <div class=form-group>
-      <%= f.label :email %>
-      <%= f.email_field :email, autocapitalize: 'off', class: 'form-control' %>
-    </div>
-    <div class=form-group>
-      <%= f.label :phone, 'Contact Number' %>
-      <%= f.phone_field :phone, class: 'form-control' %>
-    </div>
-    <div class=form-group>
-      <%= f.label :password %>
-      <%= f.password_field :password, placeholder: 'Leave blank for unchanged', class: 'form-control' %>
-    </div>
-    <div class=form-group>
-      <label for='user[group_ids][]'>Groups</label><span class=small> (multi-select)</span>
-      <select class='form-control multi-select' id=user_group_ids
-              style='height: 20em'
-              name='user[group_ids][]' multiple=true data-placeholder="Choose one or more groups...">
-        <% @groups.each do |group| -%>
-          <option value='<%= group.id %>' <%= 'selected' if @user_groups.include?(group) %>>
-          <%= group.name %>
-          </option>
-        <% end -%>
-      </select>
-    </div>
-    <div class=form-group>
-      <%= f.submit @user.new_record? ? 'Create' : 'Update', class: 'button btn' %>
-    </div>
-  <% end %>
+  </div>
 </div>

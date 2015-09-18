@@ -1,9 +1,13 @@
 class User < ActiveRecord::Base
-  # Include default devise modules. Others available are:
-  # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable, :validatable
-
+  #Only enable :ldap_authenticatable if the config file is present and enabled. See 0_settings.rb under initializers.
+  if Auth.ldap_enabled?
+    devise :database_authenticatable, :ldap_authenticatable, :registerable,
+           :recoverable, :rememberable, :trackable, :validatable, :timeoutable
+    before_save :clean_password_for_ldap
+  else
+    devise :database_authenticatable, :registerable,
+           :recoverable, :rememberable, :trackable, :validatable, :timeoutable
+  end
   scope :same_client_as, lambda { |user| where client: user.client }
 
   class << self
@@ -31,6 +35,7 @@ class User < ActiveRecord::Base
             end
             user = User.where(email: record['email']).first_or_initialize(
               name: record['name'],
+              user_name: record['email'],
               password: password,
             )
             user.client = api.client
@@ -53,6 +58,12 @@ class User < ActiveRecord::Base
     def log_out_api(api)
       api.delete('/account').first
     end
+
+    def token_timeout
+      secs = ENV['TOKEN_EXTEND_SECONDS']
+      secs ||= Devise.timeout_in if Devise.respond_to? :timeout_in
+      secs || 30.minutes
+    end
   end
 
   validates :name, presence: true
@@ -66,13 +77,15 @@ class User < ActiveRecord::Base
     @groups ||= if new_record? or not api_user_id
       []
     else
-      api.get(related_groups_url(api_user_id)).map { |record| Group.new api, record }
+      api.get(related_groups_url(api_user_id)).map do |record|
+        Group.new api, record
+      end
     end
   end
 
   def create_api_token
     XN::Api.authenticator_for(self) do |api|
-      api.post token_action_url(api_user_id)
+      api.post token_action_url(api_user_id), soft_timeout: User.token_timeout.to_i
     end
   end
 
@@ -89,6 +102,35 @@ class User < ActiveRecord::Base
       true
     end
   end
+
+  # Called by the devise_ldap_authenticatable gem when creating a user for the first time.
+  # Assumed as Confirmed since passed LDAP Verification.
+  # LM Client (e.g. sample001 is set from the ldap_config Proc (Currently loading from YAML under /opt/xn_apps/))
+  def ldap_before_save(group_ids = nil)
+    self.account_type = 'LDAP'
+    self.client = Auth.ldap_config['lightmesh_client']
+    if name.blank?
+      begin
+        self.name = Devise::LDAP::Adapter.get_ldap_param(self.user_name,"cn").first.to_s
+      rescue
+        self.name = self.email
+      end
+    end
+  end
+
+  # For Security purposes do not persist LDAP Passwords to the DB when using both Strategies.
+  def clean_password_for_ldap
+    self.encrypted_password = '' if ldap?
+  end
+
+  def ldap?
+    account_type == 'LDAP'
+  end
+
+  def local?
+    account_type.blank? or account_type == 'LOCAL'
+  end
+
 
   private
 
@@ -125,7 +167,12 @@ class User < ActiveRecord::Base
   def permission_properties(group_ids)
     if group_ids
       [:create, :read, :update, :delete, :action].each_with_object({}) do |perm, memo|
-        memo["inherit_#{perm}"] = { set: group_ids }
+        if perm != :read and self.read_only
+          memo["inherit_#{perm}"] = { set: nil }
+        else
+          memo["inherit_#{perm}"] = { set: group_ids }
+        end
+
       end
     else
       {}

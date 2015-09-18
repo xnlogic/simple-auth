@@ -1,0 +1,108 @@
+<html>
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <title>A new user has been registered</title>
+    <style>
+      body {
+        background: #EAEAEA;
+      }
+      .container {
+        font-family: arial, sans-serif;
+        background: #FFFFFF;
+        width: 650px;
+        margin-left: auto;
+        margin-right: auto;
+        font-size: 10px;
+        padding: 10px;
+      }
+      .container img {
+        margin-left: auto;
+        margin-right: auto;
+        width: 300px;
+        display: block;
+        margin-top: 40px;
+        margin-bottom: 20px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 650px;
+      }
+      th {
+        color: #222222;
+        background: #F4F4F4;
+        font-weight: bold;
+        padding: 5px 2px 5px 2px;
+        text-align: left;
+      }
+      tr.even {
+        background: #F2F2F2;
+      }
+      td {
+        text-align: center;
+        color: #222222;
+        padding: 5px 2px 5px 2px;
+      }
+      h2 {
+        font-family: arial, sans-serif;
+        font-size: 18px;
+        padding: 10px 5px 10px 5px;
+        color: #222222;
+        margin-bottom: 0px;
+        text-align: center;
+        width: 240px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      #link {
+        background: #EEEEEE;
+        padding: 10px;
+        width: 300px;
+        margin-bottom: 60px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      #link a {
+        color: #222222;
+        text-decoration: underline
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <img src="http://app3.lightmesh.com/assets/lightmesh-logo-site-x2.png" />
+      <br/><br/>
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <%= "a new user has registered:" %>
+              <br />
+              <br />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              name: <%= @user.name %>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              email: <%= @user.email %>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <br />
+              <br />
+              <div id="link">
+              <%= link_to @base + "/users/" + @user.id.to_s + "/edit" do %>
+                Click Here Review Registration
+              <% end %>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

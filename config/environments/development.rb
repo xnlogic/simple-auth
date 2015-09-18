@@ -41,7 +41,11 @@ Rails.application.configure do
   }
   # ActionMailer Config
   config.action_mailer.default_url_options = { :host => 'localhost:3000' }
-  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.delivery_method = :mailgun
+  config.action_mailer.mailgun_settings = {
+        api_key: 'key-b497a227236f189e3ed242da9526ab8b',
+        domain: 'sandboxff35946d0df140eeb915d3db0ee18c0c.mailgun.org'
+  }
   config.action_mailer.raise_delivery_errors = true
   # Send email in development mode?
   config.action_mailer.perform_deliveries = true

@@ -10,4 +10,12 @@ module UsersHelper
   def update_user_path(user, params = {})
     url_for({ controller: "users", action: "update", id: user.id }.merge(params))
   end
+
+  def account_type(user)
+    if user.ldap?
+      "LDAP"
+    else
+      "Local"
+    end
+  end
 end

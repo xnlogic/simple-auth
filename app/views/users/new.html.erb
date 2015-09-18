@@ -1,0 +1,70 @@
+<%= render :partial => 'users/users_table' %>
+<div class="modal-backdrop"></div>
+<div class="modal user-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">
+          <h4 class="modal-title">
+            new user
+          </h4></div>
+      </div>
+      <%= form_for(@user, url: create_user_path(@user), html: { class: 'user-form' }) do |f| %>
+        <div class="modal-body">
+          <div class=row>
+            <div class=col-xs-8>
+              <%= f.hidden_field :client, :autofocus => true, class: 'form-control' %>
+              <div class="form-group">
+                <%= f.label :name %>
+                <%= f.text_field :name, class: 'form-control' %>
+                <%= @user.errors[:name].join(",") %>
+              </div>
+              <div class="form-group">
+                <%= f.label :email %>
+                <%= f.email_field :email, class: 'form-control' %>
+                <%= @user.errors[:email].join(",") %>
+              </div>
+              <div class="form-group">
+                <%= f.label :password %>
+                <%= f.password_field :password, class: 'form-control' %>
+                <%= @user.errors[:password].join(",") %>
+              </div>
+              <div class="form-group">
+                <%= f.label :password_confirmation %>
+                <%= f.password_field :password_confirmation, class: 'form-control' %>
+                <%= @user.errors[:password_confirmation].join(",") %>
+              </div>
+            </div>
+            <div class=col-xs-4>
+              <div class=form-group>
+                <label for='user[group_ids][]'>Groups</label><span class=small> (multi-select)</span>
+                <select class='form-control multi-select' id=user_group_ids
+                        style='height: 20em'
+                        name='user[group_ids][]' multiple=true data-placeholder="Choose one or more groups...">
+                  <% @groups.each do |group| -%>
+                    <option value='<%= group.id %>' <%= 'selected' if @user_groups.include?(group) %>>
+                    <%= group.name %>
+                    </option>
+                  <% end -%>
+                </select>
+              </div>
+              <br/>
+              <div class=form-group>
+                <label>Read Only</label>
+                <%= f.check_box :read_only %>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="form-group pull-right">
+            <%= f.submit @user.new_record? ? 'Create' : 'Update', class: 'btn btn-default' %>
+            <a href="/users">
+              <div class="btn btn-default">Cancel</div>
+            </a>
+          </div>
+        <div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,25 +1,14 @@
-<div class="container">
-  <div class="row">
-    <h3>Users for <%= current_user.client %></h3>
-    <div class="column">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Groups</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @users.each do |user| %>
-            <tr>
-              <%= render user %>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
+<script>
+  (function() {
+    var token = '<%= session[:api_token] %>';
+    if (token !== '') {
+      var a = token.split(' ');
+      if (a.length === 2) {
+        document.cookie = ('XNClient=' + a[0] + '; path=/');
+        document.cookie = ('XNToken=' + a[1] + '; path=/');
+      }
+    }
+    return true;
+  })();
+</script>
+<%= render :partial => 'users/users_table' %>

@@ -4,11 +4,21 @@ class ApplicationController < ActionController::Base
   #
   #protect_from_forgery with: :exception
 
+  helper_method :ldap_enabled?
+
   rescue_from XN::Error::ApiError, with: :render_api_exception
 
   prepend_before_filter :log_out_if_token_invalid
 
+  rescue_from DeviseLdapAuthenticatable::LdapException do |exception|
+    render :text => exception, :status => 500
+  end
+
   protected
+
+  def ldap_enabled?
+    true
+  end
 
   def log_out_if_token_invalid
     if logged_in?

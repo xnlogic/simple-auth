@@ -98,6 +98,13 @@ module XN
           end
         end
       end
+
+      def client_tokens(client_name)
+        admin_api=XN::Api.new(XN::Api.admin_token)
+        client=admin_api.get("/is/client/unique/filters/name~1?name~1=#{client_name}").first
+        raise XN::Error::NotFoundError("Could not find client with name: #{client_name}") unless client
+        client_tokens=admin_api.get("/is/client/id/#{client["id"]}/report/app_tokens")
+      end
     end
 
     def initialize(token)
@@ -189,5 +196,7 @@ module XN
       message = json['message'] rescue json
       fail exception_class.new(message, status_code)
     end
+
+
   end
 end

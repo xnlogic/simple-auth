@@ -1,5 +1,6 @@
 class Users::SessionsController < Devise::SessionsController
   include Concerns::SignIn
+  layout 'signup', only: [:new, :create]
 
   respond_to :json
 
@@ -21,7 +22,7 @@ class Users::SessionsController < Devise::SessionsController
           if token
             render json: token
           elsif token_error
-            render json: { error: token_error.message }, status: token_error.status
+            render json: { error: token_error[:message] }, status: token_error[:status]
           else
             render json: {}, status: :unauthorized
           end
@@ -38,9 +39,9 @@ class Users::SessionsController < Devise::SessionsController
           render json: {}, status: :unauthorized
         end
         format.html do
-          flash[:error] = "Invalid email address or password"
+          flash[:error] = "Invalid login or password"
           param = params['user'] || {}
-          self.resource = User.new email: param['email']
+          self.resource = User.new user_name: param['user_name']
           render :new
         end
       end
@@ -62,6 +63,6 @@ class Users::SessionsController < Devise::SessionsController
   end
 
   def after_sign_in_path_for(user)
-    welcome_users_path
+    users_path
   end
 end

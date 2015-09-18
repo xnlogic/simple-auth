@@ -1,0 +1,30 @@
+## LightMesh LDAP Config
+## Adapted from devise_ldap_authenticatable
+## For fe-server this currently should reside under /opt/xn_apps/ldap.yaml
+
+## Environment
+
+development:
+  enabled: true
+  lightmesh_client: sample001
+  host: ad.lightmesh.com
+  port: 389
+  attribute: mail
+  base: DC=ad,DC=lightmesh,DC=com
+  admin_user: CN=srv.lightmesh.ad,CN=Users,DC=ad,DC=lightmesh,DC=com
+  admin_password: SuperSecretNotReal
+  ssl: false
+
+production: &production
+  enabled: true
+  lightmesh_client: sample001
+  host: ad.lightmesh.com
+  port: 389
+  attribute: mail
+  base: DC=ad,DC=lightmesh,DC=com
+  admin_user: CN=srv.lightmesh.ad,CN=Users,DC=ad,DC=lightmesh,DC=com
+  admin_password: SomeSecret
+  ssl: false
+  additional_ldap_filter: "(&(objectClass=user)(sAMAccountType=805306368)(memberof:1.2.840.113556.1.4.1941:=CN=LM_ALL_USERS_01,OU=LightMesh,OU=Groups,DC=ad,DC=lightmesh,DC=com))"
+
+

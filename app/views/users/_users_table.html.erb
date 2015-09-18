@@ -1,0 +1,28 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="column">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Groups</th>
+            <% if ldap_enabled? %>
+              <th>Type</th>
+              <th>LDAP Username</th>
+            <% end %>
+            <th class="cell medium"></th>
+            <th class="cell medium"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @users.each do |user| %>
+            <tr>
+              <%= render partial: "users/user", :locals => {user: user} %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
