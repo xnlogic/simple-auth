@@ -16,7 +16,7 @@ class UserMailer < ApplicationMailer
   def ldap_account_notification(user, base)
     @user = user
     @base = base
-    mail :to => user.email, :subject => "Your LDAP login has been added to Lightmesh"
+    mail :to => user.email, :subject => "Your LDAP login has been added"
   end
 
   def sign_up_notification(user, base)
