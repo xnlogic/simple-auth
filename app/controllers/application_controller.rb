@@ -17,7 +17,7 @@ class ApplicationController < ActionController::Base
   protected
 
   def ldap_enabled?
-    true
+    false
   end
 
   def log_out_if_token_invalid
