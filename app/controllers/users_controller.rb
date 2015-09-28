@@ -186,14 +186,17 @@ class UsersController < ApplicationController
   end
 
   def log_in_if_token_valid
-    cookies = request.headers['Cookie'].split('; ').map {|s| {s.split('=')[0].to_sym => s.split('=')[1]}}.reduce(:merge)
-    if cookies[:XNClient] and cookies [:XNToken]
-      api = XN::Api.new("#{cookies[:XNClient]} #{cookies[:XNToken]}")
-
-      user = User.where(:email => api.get("/account").first["email"]).first rescue nil
-
-      if user
-        sign_in User, user
+    header = request.headers['Cookie']
+    if header
+      cookies = header.split('; ').reduce({}) do |h, s|
+        k, v = s.split('=') if s
+        h[k.to_sym] = v if k and v
+        h
+      end
+      if cookies[:XNClient] and cookies[:XNToken]
+        api = XN::Api.new("#{cookies[:XNClient]} #{cookies[:XNToken]}")
+        user = User.where(:email => api.get("/account").first["email"]).first rescue nil
+        sign_in User, user if user
       end
     end
   end
