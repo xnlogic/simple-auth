@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   respond_to :json
   include Concerns::SignIn
-  before_action :log_in_if_token_valid, only: [:index]
+  before_action :log_in_if_token_valid, only: [:index, :create]
   before_action :authenticate_user!, except: [:welcome]
   before_action :authenticate_admin_or_current_user!, except: [:welcome]
   before_action :set_user_locals, except: [:welcome]
@@ -39,13 +39,30 @@ class UsersController < ApplicationController
 
       #TODO - PULL BASE FILTER OPTIONS FROM LDAP.YML
       #base_filter = Net::LDAP::Filter.construct("(&(objectClass=user)(sAMAccountType=805306368)(memberof:1.2.840.113556.1.4.1941:=CN=LM_ALL_USERS_01,OU=LightMesh,OU=Groups,DC=zd,DC=lightmesh,DC=com))")
-      search_filter = Net::LDAP::Filter.eq("cn", params[:search] + "*")
+      search = params[:search].to_s.strip
+      if search =~ /\*/
+        search_filter = Net::LDAP::Filter.eq("cn", search)
+      else
+        split = search.split(/[ ,]+/)
+        if split.length >= 2
+          search_filter = Net::LDAP::Filter.intersect(
+            Net::LDAP::Filter.eq("cn", "*#{split.join('*')}*"),
+            Net::LDAP::Filter.eq("cn", "*#{split.reverse.join('*')}*"))
+        else
+          search_filter = Net::LDAP::Filter.eq("cn", "*#{search}*")
+        end
+      end
       query_filter = search_filter #Net::LDAP::Filter.join(base_filter, search_filter)
-
-      entries = c.search(filter: query_filter)
-      respond_with entries.
-        keep_if {|u| u.objectClass[1] == "person" and u.respond_to? :userprincipalname }.
-        map {|u| {cn: u.cn.first, userprincipalname: u.userprincipalname.first}}
+      entries = c.
+        search(filter: query_filter).
+        select { |u|
+          u and u.objectClass[1] == "person" and u.respond_to? :userprincipalname
+        }.map { |u|
+          cn = u.cn.first rescue nil
+          name = u.userprincipalname.first rescue nil
+          {cn: cn, userprincipalname: name}
+        }
+      respond_with entries
     end
   end
 
@@ -70,6 +87,24 @@ class UsersController < ApplicationController
             end
           }
           format.json { render json: @user.errors, status: :unprocessable_entity }
+        end
+      end
+    end
+  end
+
+  def create_user(client, password, tokens )
+  end
+
+  def get_db_name(api, company_name)
+    unless company_name.blank?
+      db_name = company_name.gsub(/[^a-zA-Z]/, "").downcase
+      # TODO: always suffix customer names with something short and random to prevent client detection # SECURITY
+      existing_dbs = api.get "/is/client/filter/name/properties/name?name[regex]=#{db_name}&limit=10000"
+      100.times do |i|
+        suffix = i.nonzero? ? i.to_s : ""
+        n = db_name + suffix
+        if existing_dbs.none? { |id, name| name == n }
+          return n
         end
       end
     end
@@ -136,8 +171,9 @@ class UsersController < ApplicationController
 
   def set_user_locals
     @users = User.same_client_as(current_user).order(:name).all
-    @users_to_groups = with_current_user_api do |api|
-      Group.users_to_groups_map(api)
+    with_current_user_api do |api|
+      User.lookup_user_details(api, @users)
+      @users_to_groups = Group.users_to_groups_map(api)
     end
     @users_to_groups ||= Group.empty_user_group_hash
   end
@@ -148,7 +184,7 @@ class UsersController < ApplicationController
 
   def user_params
     if user_manager?
-      params.require(:user).permit(:name, :email, :phone, :password, :password_confirmation, :remember_me, :status, :read_only, :client, :notify_of_signup, :account_type, :user_name)
+      params.require(:user).permit(:name, :email, :phone, :password, :password_confirmation, :remember_me, :status, :read_only, :client, :notify_of_signup, :account_type, :user_name, :service_account)
     else
       params.require(:user).permit(:name, :email, :phone, :password, :password_confirmation, :remember_me, :read_only, :client, :account_type, :user_name)
     end

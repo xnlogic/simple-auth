@@ -15,7 +15,7 @@
   <td><span><%= account_type user %></span></td>
   <td><a><%= user.user_name || "--" %></td>
 <% end %>
-<td class="cell medium">
+<td>
   <% if @users_to_groups[user.api_user_id].any? %>
     <%= link_to disable_user_path(user) do %>
       <button class="btn btn-default">Disable</button>

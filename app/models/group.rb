@@ -1,10 +1,20 @@
 class Group
   class << self
-    def all(api)
-      groups = api.get('/is/group').map do |record|
-        Group.new api, record
+    def all_with_users(api)
+      groups = api.pull('/is/group',
+                        [:id, :name,
+                         {'traversal.read_users' => [:id]}])
+      groups.sort_by { |record| record['name'] }.map do |record|
+        [Group.new(api, record), record['traversal.read_users']]
       end
-      groups.sort_by! { |group| group.name }
+    end
+
+    def all(api)
+      groups = api.pull('/is/group',
+                        [:id, :name])
+      groups.sort_by { |record| record['name'] }.map do |record|
+        Group.new(api, record)
+      end
     end
 
     def empty_user_group_hash
@@ -13,9 +23,11 @@ class Group
 
     def users_to_groups_map(api)
       res = empty_user_group_hash
-      all(api).inject(res) do |memo, group|
-        group.user_ids.each do |user_id|
-          memo[user_id] << group
+      all_with_users(api).inject(res) do |memo, (group, users)|
+        if users
+          users.each do |user|
+            memo[user['id'].to_s] << group
+          end
         end
         memo
       end

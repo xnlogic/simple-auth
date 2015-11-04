@@ -45,7 +45,9 @@ module XN
              "Mel Gibson",
              "Penny Pincher",
              "Senor Manager",
-             "Sir Lancelot"
+             "Sir Lancelot",
+             "SGDC Support",
+             "IPAM Admin"
            ]}
         end
       end
@@ -120,6 +122,10 @@ module XN
 
     def get(resource_url, &block)
       call_http_server Net::HTTP::Get.new("#{ api_prefix }#{ resource_url }"), &block
+    end
+
+    def pull(resource_url, body, &block)
+      post("#{resource_url}/pull", body, &block)
     end
 
     def post(resource_url, body = nil, &block)

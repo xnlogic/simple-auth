@@ -32,6 +32,11 @@
                   <%= f.password_field :password, placeholder: 'Leave blank for unchanged', class: 'form-control' %>
                   <%= @user.errors[:password].join(",") %>
                 </div>
+                <div class="form-group">
+                  <%= f.label :service_account %>
+                  <%= f.check_box :service_account, class: 'form-control' %>
+                  <%= @user.errors[:service_account].join(",") %>
+                </div>
               <% end %>
               <div class=form-group>
                 <div class=row>

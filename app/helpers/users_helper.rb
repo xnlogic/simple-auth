@@ -14,6 +14,8 @@ module UsersHelper
   def account_type(user)
     if user.ldap?
       "LDAP"
+    elsif user.service_account
+      "Service"
     else
       "Local"
     end

@@ -2,11 +2,11 @@ class User < ActiveRecord::Base
   #Only enable :ldap_authenticatable if the config file is present and enabled. See 0_settings.rb under initializers.
   if Auth.ldap_enabled?
     devise :database_authenticatable, :ldap_authenticatable, :registerable,
-           :recoverable, :rememberable, :trackable, :validatable, :timeoutable
+           :recoverable, :rememberable, :trackable, :timeoutable
     before_save :clean_password_for_ldap
   else
     devise :database_authenticatable, :registerable,
-           :recoverable, :rememberable, :trackable, :validatable, :timeoutable
+           :recoverable, :rememberable, :trackable, :timeoutable
   end
   scope :same_client_as, lambda { |user| where client: user.client }
 
@@ -64,8 +64,23 @@ class User < ActiveRecord::Base
       secs ||= Devise.timeout_in if Devise.respond_to? :timeout_in
       secs || 30.minutes
     end
-  end
 
+    def lookup_user_details(api, users)
+      ids = users.map { |user| user.api_user_id }.join(',')
+      details = api.pull("/is/user/ids/#{ids}", [:id, :service_account])
+      details = details.group_by { |u| u['id'].to_s }
+      users.each do |user|
+        user.service_account = details[user.api_user_id].first['service_account']
+      end
+    end
+  end
+  validates_presence_of   :email
+  validates_format_of     :email, with: /\A[^@]+@[^@]+\z/, allow_blank: true
+  validate :unique_email_per_client
+
+  validates_presence_of     :password, :on => :create
+  validates_confirmation_of :password, :on => :create
+  validates_length_of       :password, within: 6..72, allow_blank: true
   validates :name, presence: true
   validates :client, presence: true
 
@@ -73,11 +88,37 @@ class User < ActiveRecord::Base
 
   before_create :replicate_to_api
 
+  attr_accessor :service_account
+
+  def unique_email_per_client
+    if User.where(:email => email, :client => client).where.not(:id => id).count > 0
+      errors.add(:email, "must be unique per client")
+    end
+  end
+
+  def api_user_details(api)
+    @details ||= if new_record? or not api_user_id
+                   {}
+                 else
+                   api.pull(model_url(api_user_id), [:service_account, {inherit_read: [:id, :name]}]).first
+                 end
+    @service_account = @details['service_account']
+    @details
+  end
+
+  def service_account
+    if @service_account == '0'
+      false
+    else
+      @service_account
+    end
+  end
+
   def groups(api)
-    @groups ||= if new_record? or not api_user_id
+    if new_record? or not api_user_id
       []
     else
-      api.get(related_groups_url(api_user_id)).map do |record|
+      api_user_details(api)['inherit_read'].map do |record|
         Group.new api, record
       end
     end
@@ -142,7 +183,11 @@ class User < ActiveRecord::Base
   end
 
   def api_properties(group_ids = nil)
-    { name: name, email: email }.merge(permission_properties(group_ids))
+    {
+      name: name,
+      email: email,
+      service_account: service_account
+    }.merge(permission_properties(group_ids))
   end
 
   def save_api_user(api, group_ids = nil)
