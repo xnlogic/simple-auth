@@ -36,7 +36,7 @@ auth:
 Production:
 ```yaml
 prodauth:
-  image: lightmesh/simple-auth
+  image: xnlogic/simple-auth
   links:
     - prodapi
   volumes_from:

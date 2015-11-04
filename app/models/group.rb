@@ -7,6 +7,8 @@ class Group
       groups.sort_by { |record| record['name'] }.map do |record|
         [Group.new(api, record), record['traversal.read_users']]
       end
+    rescue XN::Error::UnauthorizedError
+      []
     end
 
     def all(api)
@@ -15,6 +17,8 @@ class Group
       groups.sort_by { |record| record['name'] }.map do |record|
         Group.new(api, record)
       end
+    rescue XN::Error::UnauthorizedError
+      []
     end
 
     def empty_user_group_hash

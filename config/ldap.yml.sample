@@ -6,7 +6,7 @@
 
 development:
   enabled: true
-  lightmesh_client: sample001
+  xn_client: sample001
   host: ad.lightmesh.com
   port: 389
   attribute: mail
@@ -17,7 +17,7 @@ development:
 
 production: &production
   enabled: true
-  lightmesh_client: sample001
+  xn_client: sample001
   host: ad.lightmesh.com
   port: 389
   attribute: mail

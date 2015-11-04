@@ -83,7 +83,7 @@ Rails.application.configure do
     password: Rails.application.secrets.email_provider_password
   }
   # ActionMailer Config
-  config.action_mailer.default_url_options = { :host => "lightmesh.com" }
+  config.action_mailer.default_url_options = { :host => "example.com" }
   config.action_mailer.delivery_method = :mailgun
   config.action_mailer.mailgun_settings = {
         api_key: 'key-b497a227236f189e3ed242da9526ab8b',

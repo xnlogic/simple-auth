@@ -11,8 +11,8 @@
     %>
   <% end %>
 </td>
+<td><span><%= account_type user %></span></td>
 <% if ldap_enabled? %>
-  <td><span><%= account_type user %></span></td>
   <td><a><%= user.user_name || "--" %></td>
 <% end %>
 <td>

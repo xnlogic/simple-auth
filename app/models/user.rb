@@ -149,7 +149,7 @@ class User < ActiveRecord::Base
   # LM Client (e.g. sample001 is set from the ldap_config Proc (Currently loading from YAML under /opt/xn_apps/))
   def ldap_before_save(group_ids = nil)
     self.account_type = 'LDAP'
-    self.client = Auth.ldap_config['lightmesh_client']
+    self.client = Auth.ldap_config['xn_client']
     if name.blank?
       begin
         self.name = Devise::LDAP::Adapter.get_ldap_param(self.user_name,"cn").first.to_s

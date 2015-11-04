@@ -1,5 +1,5 @@
 class UserMailer < ApplicationMailer
-  default from: "no-reply@lightmesh.com"
+  default from: "no-reply@example.com"
 
   def sign_up_confirmation(user, base)
     @user = user
